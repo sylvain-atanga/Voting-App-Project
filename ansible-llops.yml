@@ -1,0 +1,51 @@
+---
+- name: Create user and copy files into user home directory
+  hosts: all
+  tasks:
+    - name: create user
+      user:
+        name: "{{a}}"
+        password: "{{b}}"
+        home: "{{c}}"
+        uid: "{{d}}"
+   - name: create files/directories in users home directory
+     file:
+       name: "{{e}}"
+       state: "{{f}}"
+---
+- name: Implementing playscope variables
+  hosts: all
+  vars:
+    - a: git
+    - b: present
+    - c: yes
+  tasks:
+    - name: Install software applications
+      apt:
+        name: "{{a}}"
+        state: "{{b}}"
+        update_cache: "{{c}}"
+---
+- name: Create users and copy files into user home directories
+  hosts: all
+  tasks:
+    - name: Create users
+      user:
+        name: "{{item:a}}"
+        password: "{{item:b}}"
+        home: "{{item:c}}"
+      with_items:
+        - {a: Elna,b: lgl,c: /home/Elna}
+        - {a: BI,b: ini,c: /tmp/BI}
+        - {a: Ijombe,b: ijo,c: /home/ubuntu/Ijombe}
+    - name: Copy files to users home directory
+      copy:
+        src: "{{item:a}}"
+        dest: "{{item:b}}"
+      with_item:
+        - {a: /etc/passwd,b: /home/Elna}
+        - {a: /etc/passwd,b: /tmp/BI}
+        - {a: /etc/group,b: /home/ubuntu/Ijombe}
+---
+
+...

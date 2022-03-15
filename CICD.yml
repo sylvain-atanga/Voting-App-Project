@@ -1,0 +1,48 @@
+---
+- name: Configuration of jenkins
+  hosts: jenkins ip
+  tasks:
+    - name: installation of java, git and maven
+      apt:
+        name: "{{item.a}}"
+        state: present
+        update_cache: "{{item.b}}"
+      with_items:
+        - {a: openjdk-11-jdk,b: yes}
+        - {a: maven,b: no}
+        - {a: git,b: no}
+    - name: Download jenkins.war
+      get_url:
+        url: https://get.jenkins.io/war-stable/2.332.1/jenkins.war
+        dest: /home/ubuntu
+- name: Configuration of tomcat servers
+  hosts: servers
+  tasks:
+    - name: Install tomcat9 and tomcat9-admin
+      apt:
+        name: "{{item.a}}"
+        state: present
+        update_cache: "{{item.b}}"
+      with_items:
+        - {a: tomcat9,b: no}
+        - {a: tomcat9-admin,b: no}
+    - name: copy tomcat-users.xml file
+      copy:
+        src: tomcat-users.xml
+        dest: /etc/tomcat9
+    - name: Restart Tomcat9
+      service:
+        name: tomcat9
+        state: restarted
+    - name: check if tomcat9 is reachable
+      uri:
+        url: "{{item}}"
+        status_code: 200
+      with_items:
+        - https://18.212.8.179
+        - https://3.88.215.90
+---
+- name: implementing Handlers
+  hosts: all
+  tasks:
+
